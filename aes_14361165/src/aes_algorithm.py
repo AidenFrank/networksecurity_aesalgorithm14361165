@@ -33,9 +33,16 @@ def MixColumns():
 def encryption(plaintext, subkey):
     # Take the plaintext and convert it all into hex, then put in a list
     bytes = [i.encode("utf-8").hex() for i in list(plaintext)]
-    # Create a list to keep track of all of the bytearrays we have
+    # Create a list to keep track of all of the bytes we have
     blocks = []
-    # Add to blocks while bytes still has values
+    # Create a 2d list for each block with each block being 16 bytes
+    for i in range (0, (len(bytes) + 15) // 16):
+        # Creates a 4 x 4 2d array with '00' for padding
+        blocks.append([['00']* 4 for j in range(4)])
+        for j in range (0, 4):
+            for k in range (0, 4):
+                if len(bytes) > 0:
+                    blocks[i][j][k] = bytes.pop(0)
     
     print("Done with encryption")
 
