@@ -18,7 +18,12 @@ except IndexError:
 else:
     print("Using subkey file: " + subkeyFile.name)
 
-def AddKey():
+def AddKey(block1, block2):
+    block3 = [['00']* 4 for j in range(4)]
+    for row in range (0, 4):
+        for col in range (0, 4):
+            block3[row][col] = hex(block1[row][col] ^ block2[row][col])
+    return(block3)
     print("Done with AddKey")
 
 def SubBytes():
@@ -32,7 +37,8 @@ def MixColumns():
 
 def encryption(plaintext, subkey):
     # Take the plaintext and convert it all into hex, then put in a list
-    bytes = [i.encode("utf-8").hex() for i in list(plaintext)]
+    bytes = [ord(i) for i in list(plaintext)]
+    print(bytes)
     # Create a list to keep track of all of the bytes we have
     blocks = []
     # Create a 2d list for each block with each block being 16 bytes
@@ -43,7 +49,8 @@ def encryption(plaintext, subkey):
             for k in range (0, 4):
                 if len(bytes) > 0:
                     blocks[i][j][k] = bytes.pop(0)
-    
+    print(hex(blocks[0][0][0] ^ blocks[0][0][1]))
+    #AddKey(bytes, bytes)
     print("Done with encryption")
 
 encryption(plaintextFile.read(), subkeyFile.read())
