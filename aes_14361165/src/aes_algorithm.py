@@ -35,22 +35,33 @@ def ShiftRows():
 def MixColumns():
     print("Done with MixColumns")
 
-def encryption(plaintext, subkey):
+def encryption(plaintext, subkeyFile):
     # Take the plaintext and convert it all into hex, then put in a list
-    bytes = [ord(i) for i in list(plaintext)]
-    print(bytes)
+    plaintextBytes = [ord(i) for i in list(plaintext)]
     # Create a list to keep track of all of the bytes we have
-    blocks = []
+    plaintextBlocks = []
     # Create a 2d list for each block with each block being 16 bytes
-    for i in range (0, (len(bytes) + 15) // 16):
+    for i in range (0, (len(plaintextBytes) + 15) // 16):
         # Creates a 4 x 4 2d array with '00' for padding
-        blocks.append([['00']* 4 for j in range(4)])
+        plaintextBlocks.append([['00']* 4 for j in range(4)])
         for j in range (0, 4):
             for k in range (0, 4):
-                if len(bytes) > 0:
-                    blocks[i][j][k] = bytes.pop(0)
-    print(hex(blocks[0][0][0] ^ blocks[0][0][1]))
-    #AddKey(bytes, bytes)
+                if len(plaintextBytes) > 0:
+                    plaintextBlocks[i][j][k] = plaintextBytes.pop(0)
+    with subkeyFile as file:
+        subkeys = [line.rstrip() for line in file]
+    subkeyBytes = []
+    for i in range (0, len(subkeys)):
+        bytes = [int((subkeys[i][j:j+2]), 16) for j in range(0, len(subkeys[i]), 2)]
+        subkeyBytes.append(bytes)
+    subkeyBlocks = []
+    for i in range (0, len(subkeyBytes)):
+        subkeyBlocks.append([['00']* 4 for j in range(4)])
+        for j in range (0, 4):
+            for k in range (0, 4):
+                if len(subkeyBytes[i]) > 0:
+                    subkeyBlocks[i][j][k] = subkeyBytes[i].pop(0)
+    # We now have arrays of 4x4 blocks for the plaintext and subkeys
     print("Done with encryption")
 
-encryption(plaintextFile.read(), subkeyFile.read())
+encryption(plaintextFile.read(), subkeyFile)
