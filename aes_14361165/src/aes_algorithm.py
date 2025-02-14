@@ -18,13 +18,33 @@ except IndexError:
 else:
     print("Using subkey file: " + subkeyFile.name)
 
+# This function is used to print a block received as a 4 x 4 list of ASCII
+def PrintBlock(block):
+    print("Plain:")
+    for col in range (0, 4):
+        for row in range (0, 4):
+            print(chr(block[row][col]), end=" ")
+        print(" ")
+    print("ASCII:")
+    for col in range (0, 4):
+        for row in range (0, 4):
+            print(block[row][col], end=" ")
+        print(" ")
+    print("HEX:")
+    for col in range (0, 4):
+        for row in range (0, 4):
+            print(format(block[row][col], "02x"), end=" ")
+        print(" ")
+            
+# This performs an AddKey opertion on two blocks of 4 x 4 lists
 def AddKey(block1, block2):
+    # Create a block to hold the computed data
     block3 = [['00']* 4 for j in range(4)]
     for row in range (0, 4):
         for col in range (0, 4):
-            block3[row][col] = hex(block1[row][col] ^ block2[row][col])
+            # The data is in ACII, we use ^ to XOR it
+            block3[row][col] = block1[row][col] ^ block2[row][col]
     return(block3)
-    print("Done with AddKey")
 
 def SubBytes():
     print("Done with SubBytes")
@@ -46,8 +66,10 @@ def encryption(plaintext, subkeyFile):
         plaintextBlocks.append([['00']* 4 for j in range(4)])
         for j in range (0, 4):
             for k in range (0, 4):
+                # While the plaintextBytes still has values, add them to plaintextBlocks
                 if len(plaintextBytes) > 0:
                     plaintextBlocks[i][j][k] = plaintextBytes.pop(0)
+    # We format the subkeys in the same manner, using 4 x 4 lists
     with subkeyFile as file:
         subkeys = [line.rstrip() for line in file]
     subkeyBytes = []
@@ -62,6 +84,7 @@ def encryption(plaintext, subkeyFile):
                 if len(subkeyBytes[i]) > 0:
                     subkeyBlocks[i][j][k] = subkeyBytes[i].pop(0)
     # We now have arrays of 4x4 blocks for the plaintext and subkeys
+    PrintBlock(AddKey(plaintextBlocks[0], subkeyBlocks[0]))
     print("Done with encryption")
 
 encryption(plaintextFile.read(), subkeyFile)
