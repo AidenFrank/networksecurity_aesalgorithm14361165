@@ -129,6 +129,14 @@ def Round(block, subkeyblock):
     addKeyBlock = AddKey(mixColumnsBlock, subkeyblock)
     return addKeyBlock
 
+# This just prints a block as a hex
+def PrintHex(block):
+    result = "0x"
+    for row in range(0, 4):
+        for col in range(0, 4):
+            result += format(block[row][col], "02x")
+    print(result)
+
 def encryption(plaintext, subkeyFile):
     # Take the plaintext and convert it all into hex, then put in a list
     plaintextBytes = [ord(i) for i in list(plaintext)]
@@ -163,7 +171,7 @@ def encryption(plaintext, subkeyFile):
     # We perform the first round with our initial transformation and subkey 1
     round1 = Round(initialTrans, subkeyBlocks[1])
     # We print the first round output
-    PrintBlock(round1)
-    print("Done with encryption")
+    print("Round 1 output:")
+    PrintHex(round1)
 
 encryption(plaintextFile.read(), subkeyFile)
