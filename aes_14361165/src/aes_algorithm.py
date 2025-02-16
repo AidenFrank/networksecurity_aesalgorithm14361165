@@ -91,30 +91,43 @@ def ShiftRows(block1):
     block2[1][3] = block1[0][3]
     block2[2][3] = block1[1][3]
     block2[3][3] = block1[2][3]
-    return(block2)
+    return block2
+
+# Used to multiply two hex values together
+def HexMultiplication(a, b):
+    # a * 1 is just a, so return a
+    if b == 1:
+        return a
+    # Perform a left shift
+    c = (a << 1) & 0xff
+    if b == 2:
+        if a < 128:
+            return c
+        else:
+            return c ^ 0x1b
+    if b == 3:
+        return HexMultiplication(a, 2) ^ a
 
 def MixColumns(block1):
-    # We define our matrices, and format block1 correctly
+    # We define our matrix for multiplication
     mixColumnMatrix = [[2, 3, 1, 1], [1, 2, 3, 1], [1, 1, 2, 3], [3, 1, 1, 2]]
-    fixedBlock1 = [[0]* 4 for j in range(4)]
-    for row in range(0, 4):
-        for col in range(0, 4):
-            fixedBlock1[col][row] = block1[row][col]
     # We perform matrix multiplication
-    block2 = [[0]* 4 for j in range(4)]
-    '''
-    for i in range(0, 4):
-        for j in range(0, 4):
-            for k in range(0, 4):
-                block2[i][j] += mixColumnMatrix[i][k] * fixedBlock1[k][j]
-    '''
-    print("Done with MixColumns")
+    block2 = [[]* 4 for j in range(4)]
+    for mulRow in range(0, 4):
+        for row in range(0, 4):
+            result = 0x00
+            for col in range(0, 4):
+                result = result ^ HexMultiplication(block1[mulRow][col], mixColumnMatrix[row][col])
+            block2[mulRow].append(result)
+    return block2
 
+# This goes through all of the steps of a round of AES
 def Round(block, subkeyblock):
     subBytesBlock = SubBytes(block)
     shiftRowsBlock = ShiftRows(subBytesBlock)
     mixColumnsBlock = MixColumns(shiftRowsBlock)
-    print("Done with Round")
+    addKeyBlock = AddKey(mixColumnsBlock, subkeyblock)
+    return addKeyBlock
 
 def encryption(plaintext, subkeyFile):
     # Take the plaintext and convert it all into hex, then put in a list
@@ -147,8 +160,10 @@ def encryption(plaintext, subkeyFile):
     # We now have arrays of 4x4 blocks for the plaintext and subkeys
     # We perform the initial transformation, AddKey with subkey 0
     initialTrans = AddKey(plaintextBlocks[0], subkeyBlocks[0])
-    # We perform the first round
+    # We perform the first round with our initial transformation and subkey 1
     round1 = Round(initialTrans, subkeyBlocks[1])
+    # We print the first round output
+    PrintBlock(round1)
     print("Done with encryption")
 
 encryption(plaintextFile.read(), subkeyFile)
