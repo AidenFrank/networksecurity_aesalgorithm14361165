@@ -1,12 +1,12 @@
 import sys
-
+import os
 # We have two possible inputs for the script: plaintext file and subkey file
 # If a file is not provided, we default to the ones provided in the data folder
 try:
     plaintextFile = open(sys.argv[1], "r")
 except IndexError:
     print("No plaintext file specified. Defaulting to aes_14361165\\data\\plaintext.txt")
-    plaintextFile = open("aes_14361165\\data\\plaintext.txt", "r")
+    plaintextFile = open(os.path.abspath("aes_14361165/data/plaintext.txt"), "r")
 else:
     print("Using plaintext file: " + plaintextFile.name)
 
@@ -14,12 +14,12 @@ try:
     subkeyFile = open(sys.argv[2], "r")
 except IndexError:
     print("No subkey file specified. Defaulting to aes_14361165\\data\\subkey_example.txt")
-    subkeyFile = open("aes_14361165\\data\\subkey_example.txt", "r")
+    subkeyFile = open(os.path.abspath("aes_14361165/data/subkey_example.txt"), "r")
 else:
     print("Using subkey file: " + subkeyFile.name)
 
 try:
-    sboxFile = open("aes_14361165\\data\\sbox.txt", "r")
+    sboxFile = open(os.path.abspath("aes_14361165/data/sbox.txt"), "r")
 except:
     print("No sbox file found! Please provide one in aes_14361165\\data\\ directory and named sbox.txt.")
     print("File should be a comma seperated list of hex values.")
@@ -237,11 +237,11 @@ def encryption(plaintext, subkeyFile):
     print("Round 1 output:")
     print(ConvertHex(round1))
     # Write the result of the first subkey to a file
-    result_subkey = open("aes_14361165\\data\\result_subkey.txt", "w")
+    result_subkey = open(os.path.abspath("aes_14361165/data/result_subkey.txt"), "w")
     result_subkey.write(ConvertHex(subkey1))
     result_subkey.close()
     # Write the result of the first round to a file
-    result = open("aes_14361165\\data\\result.txt", "w")
+    result = open(os.path.abspath("aes_14361165/data/result.txt"), "w")
     result.write(ConvertHex(round1))
     result.close()
 
