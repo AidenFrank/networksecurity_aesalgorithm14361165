@@ -49,13 +49,13 @@ def PrintBlock(block):
             print(format(block[row][col], "02x"), end=" ")
         print(" ")
 
-# This just prints a block as a hex
-def PrintHex(block):
-    result = "0x"
+# This just converts a block as a hex
+def ConvertHex(block):
+    result = ""
     for row in range(0, 4):
         for col in range(0, 4):
             result += format(block[row][col], "02x")
-    print(result)
+    return(result)
             
 # This performs an AddKey opertion on two blocks of 4 x 4 lists
 def AddKey(block1, block2):
@@ -230,11 +230,20 @@ def encryption(plaintext, subkeyFile):
     # We use our initial subkey to get Subkey 1
     subkey1 = SubkeySchedule(subkeyBlocks[0], 0x01000000)
     print("Subkey 1:")
-    PrintHex(subkey1)
+    print(ConvertHex(subkey1))
     # We perform the first round with our initial transformation and subkey 1
     round1 = Round(initialTrans, subkey1)
     # We print the first round output
     print("Round 1 output:")
-    PrintHex(round1)
+    print(ConvertHex(round1))
+    # Write the result of the first subkey to a file
+    result_subkey = open("aes_14361165\\data\\result_subkey.txt", "w")
+    result_subkey.write(ConvertHex(subkey1))
+    result_subkey.close()
+    # Write the result of the first round to a file
+    result = open("aes_14361165\\data\\result.txt", "w")
+    result.write(ConvertHex(round1))
+    result.close()
+
 
 encryption(plaintextFile.read(), subkeyFile)
