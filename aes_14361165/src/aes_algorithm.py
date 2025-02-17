@@ -1,12 +1,18 @@
 import sys
 import os
+
+def find(name, path):
+    for root, dirs, files in os.walk(path):
+        if name in files:
+            return os.path.join(root, name)
+
 # We have two possible inputs for the script: plaintext file and subkey file
 # If a file is not provided, we default to the ones provided in the data folder
 try:
     plaintextFile = open(sys.argv[1], "r")
 except IndexError:
     print("No plaintext file specified. Defaulting to aes_14361165\\data\\plaintext.txt")
-    plaintextFile = open(os.path.abspath("aes_14361165/data/plaintext.txt"), "r")
+    plaintextFile = open(find("plaintext.txt", "aes_14361165"), "r")
 else:
     print("Using plaintext file: " + plaintextFile.name)
 
@@ -14,22 +20,22 @@ try:
     subkeyFile = open(sys.argv[2], "r")
 except IndexError:
     print("No subkey file specified. Defaulting to aes_14361165\\data\\subkey_example.txt")
-    subkeyFile = open(os.path.abspath("aes_14361165/data/subkey_example.txt"), "r")
+    subkeyFile = open(find("subkey_example.txt", "aes_14361165"), "r")
 else:
     print("Using subkey file: " + subkeyFile.name)
 
 try:
-    sboxFile = open(os.path.abspath("aes_14361165/data/sbox.txt"), "r")
+    sboxFile = open(sys.argv[3], "r")
 except:
-    print("No sbox file found! Please provide one in aes_14361165\\data\\ directory and named sbox.txt.")
-    print("File should be a comma seperated list of hex values.")
-    sys.exit()
+    print("No sbox file found! Defaulting to aes_14361165\\data\\sbox.txt")
+    sboxFile = open(find("sbox.txt", "aes_14361165"), "r")
 else:
     print("Using sbox file: " + sboxFile.name)
-    sbox = sboxFile.read().split(',')
-    sboxASCII = []
-    for i in sbox:
-        sboxASCII.append(chr(int(i, 0)))
+
+sbox = sboxFile.read().split(',')
+sboxASCII = []
+for i in sbox:
+    sboxASCII.append(chr(int(i, 0)))
 
 # This function is used to print a block received as a 4 x 4 list of ASCII
 def PrintBlock(block):
@@ -113,8 +119,10 @@ def HexMultiplication(a, b):
         if a < 128:
             return c
         else:
+            # High bit is set, so XOR with 0x1b
             return c ^ 0x1b
     if b == 3:
+        # Recursively perform HexMultiplication with 2, and the XOR with a
         return HexMultiplication(a, 2) ^ a
 
 def MixColumns(block1):
@@ -237,11 +245,11 @@ def encryption(plaintext, subkeyFile):
     print("Round 1 output:")
     print(ConvertHex(round1))
     # Write the result of the first subkey to a file
-    result_subkey = open(os.path.abspath("aes_14361165/data/result_subkey.txt"), "w")
+    result_subkey = open(find("result_subkey.txt", "aes_14361165"), "w")
     result_subkey.write(ConvertHex(subkey1))
     result_subkey.close()
     # Write the result of the first round to a file
-    result = open(os.path.abspath("aes_14361165/data/result.txt"), "w")
+    result = open(find("result.txt", "aes_14361165"), "w")
     result.write(ConvertHex(round1))
     result.close()
 
